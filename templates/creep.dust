@@ -1,0 +1,2 @@
+<div id={id} style="position: absolute; background-image: url('assets/soldier.gif'); background-size: 18px 18px; background-repeat: no-repeat; width: 24px; height: 24px; left: {left}px; top: {top}px; font-size: 0.5em; text-align: center;">
+</div>

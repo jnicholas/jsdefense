@@ -1,0 +1,13 @@
+<table class="grid" cellspacing="0" cellpadding="0">
+	{#tiles}
+		 {@math key="{$idx}" method="mod" operand="20"}
+		    {@eq value=0}
+		        <tr><td>{>tile /}</td>
+		    {:else}
+		        <td>{>tile /}</td>
+		    {/eq}
+		 {/math}
+	{:else}
+		<p>Unable to Generate Tiles</p>
+	{/tiles}
+</table>

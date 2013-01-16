@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="assets/jsdefense.css">
+		<script type="text/javascript" src="lib/jquery-1.8.3.min.js"></script>		
+		<script type="text/javascript" src="templates/creep.js"></script>
+		<script type="text/javascript" src="templates/tile.js"></script>
+		<script type="text/javascript" src="templates/map.js"></script>
+
+		<script type="text/javascript" src="src/Maps.js"></script>
+		<script type="text/javascript" src="src/jsdefense.js" defer="defer"></script>
+	</head>	
+	<body>
+		<title>JS Defense</title>
+		<div id="page">
+			<div id="battlefield"></div>
+			<div class="buttonbar">
+				<input type="button" value="Start" onclick="Game.start();">
+				<input type="button" value="Stop" onclick="Game.stop();">
+			</div>
+			<div id="creepcave"></div>
+		</div>
+	</body>
+</html>

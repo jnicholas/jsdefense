@@ -1,0 +1,49 @@
+body {
+	margin: 0 0 0 0;
+	overflow: hidden;
+	background-color: #191919;
+}
+
+input[type="button"] {
+	&:hover {
+		cursor: pointer;
+	}
+}
+
+div.buttonbar {
+	width: 120px;
+	margin: auto;
+}
+
+#battlefield {
+	margin-left: auto;
+	margin-right: auto;
+	width: 480px;
+	height: 320px;
+}
+
+.grid {
+	color: white;
+}
+
+.tile {
+	height: 24px;
+	width: 24px;
+	font-size: 0.3em;
+	text-align: center;
+	vertical-align: middle;
+
+	&.rock {
+		background-color: #BEBEBE;
+	}
+	&.water {
+		background-color: #0077BE;
+	}
+	&.grass {
+		background-color: #54AB47;
+	}
+	&:hover {
+		background-color: yellow;
+		cursor: pointer;
+	}
+}
