@@ -11,7 +11,7 @@ input[type="button"] {
 }
 
 div.buttonbar {
-	width: 120px;
+	width: 210px;
 	margin: auto;
 }
 
@@ -42,8 +42,24 @@ div.buttonbar {
 	&.grass {
 		background-color: #54AB47;
 	}
-	&:hover {
-		background-color: yellow;
-		cursor: pointer;
+}
+
+.creep {
+	position: absolute;
+	width: 24px;
+	height: 24px;
+	background-size: 18px 18px;
+	background-repeat: no-repeat;
+
+	&.soldier {
+		background-image: url('soldier.gif');
+	}
+	&.tank {
+		background-image: url('tank.gif');
+	}
+	&.plane {
+		width: 46px;
+		height: 18px;
+		background-image: url('airplane.gif');
 	}
 }

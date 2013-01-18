@@ -7,7 +7,7 @@ input[type="button"]:hover {
   cursor: pointer;
 }
 div.buttonbar {
-  width: 120px;
+  width: 210px;
   margin: auto;
 }
 #battlefield {
@@ -35,7 +35,21 @@ div.buttonbar {
 .tile.grass {
   background-color: #54AB47;
 }
-.tile:hover {
-  background-color: yellow;
-  cursor: pointer;
+.creep {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  background-size: 18px 18px;
+  background-repeat: no-repeat;
+}
+.creep.soldier {
+  background-image: url('soldier.gif');
+}
+.creep.tank {
+  background-image: url('tank.gif');
+}
+.creep.plane {
+  width: 46px;
+  height: 18px;
+  background-image: url('airplane.gif');
 }

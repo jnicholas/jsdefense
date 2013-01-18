@@ -6,7 +6,12 @@
 class Renderable
 
 	load : (game) ->
-		game.register(this.getId(), this)
+		game.register(@getId(), this)
+		@game = game
+
+	unload : ->
+		if (@game)
+			@game.unregister(@getId())
 
 	render : ->
 		console.log("render base!")
@@ -17,11 +22,9 @@ class Renderable
 	getId : ->		
 		@raise("getId is abstract on Renderable")
 
-	draw : ->
-		false
+	draw : false
 
-	update : ->
-		false
+	update : false
 
 # Tile Class
 class Tile extends Renderable
@@ -34,14 +37,6 @@ class Tile extends Renderable
 			@cls = 'hole'
 			@getEl().addClass(@cls)
 
-	render : (el, append)->
-		fn = (err, out) ->
-			el.innerHTML += out
-			@el = document.getElementById()					
-			console.log(this)
-			if (!document.getElementById(this.getId()))
-				console.log("failed")
-
 	getEl : ->
 		$('#' + @getId())
 
@@ -52,13 +47,11 @@ class Tile extends Renderable
 		@el = el
 		this.onRender()
 
-	update : ->
-		false
+	update : false
 
-	draw : ->
-		false
+	draw : false
 
-	onRender : () ->
+	onRender : ->
 		if (@el)
 			me = this
 			@el.addEventListener("click", (p) -> me.clickHandle())
@@ -88,7 +81,6 @@ class Map extends Renderable
 
 				# initialize entrance/exit
 				if (t.isEntrance())
-					console.log('entrance set')
 					@entrance = t
 				else if (t.isExit())
 					@exit = t
@@ -98,10 +90,9 @@ class Map extends Renderable
 		super game
 
 	render : (el) ->
-		me = this
-		fn = (err, out) ->
+		fn = (err, out) =>
 			el.innerHTML += out
-			for t in me.tiles
+			for t in @tiles
 				t.loadEl(document.getElementById(t.getId()))			
 		dust.render("map", {tiles:@tiles}, fn)
 
@@ -122,18 +113,20 @@ class Creep extends Renderable
 	constructor : ({@name, @velocity}) ->
 		if (!@velocity)
 			@velocity = 0.5
-		@left = 0#152-24
-		@top = 0#144
+		@left = 0
+		if (!@top)
+			@top = 0
 		@el = $("#creepcave") # just a place for them to spawn		
 
-	render : () ->
-
+	render : ->
 		if (@getEl().length) 
-			@getEl().offset({ top : this.top, left : this.left })		
+			@getEl().offset({ top : this.top, left : this.left })	
 		else
-			self = this
-			fn = (err, out) ->
-				self.el[0].innerHTML += out
+			fn = (err, out) =>
+				@el[0].innerHTML += out
+				@getEl().live('click', =>
+					@kill()
+				)
 
 			this.id = @getId()
 			dust.render("creep", this, fn)
@@ -142,30 +135,74 @@ class Creep extends Renderable
 		if (map.getEntrance())
 			pos = map.getEntrance().getEl().position()
 			@left = pos.left
-			@top  = pos.top	
+			@leftstart = @left
+			@top  += pos.top	
 		super game
+
+	kill : ->
+		@unload()
+		@getEl().die()
+		@getEl().remove() # remove from dom
+		@getEl().empty() # jquery caching
+		delete this
 
 	getEl : ->
 		$('#' + @getId())
 
 	getId : ->
-		return 'creep_' + @name
+		'creep_' + @name
 
 	update : ->
-		@left += @velocity
+		if ((@left + @velocity) > (@leftstart + (24*20))) # need to check for exit
+			@kill()
+		else
+ 			@left += @velocity		
 
 	draw : ->
 		@render()
 
+class Soldier extends Creep
+
+	constructor : ({@name}) ->
+		@velocity = 0.8
+		@cls = 'soldier'
+		super this
+
+class Tank extends Creep
+
+	constructor : ({@name}) ->
+		@velocity = 0.5
+		@cls = 'tank'
+		super this
+
+class Plane extends Creep
+
+	constructor : ({@name}) ->
+		@velocity = 2
+		@top = -8
+		@cls = 'plane'
+
+		super this		
+
 class CreepFactory
 
 	breed : (options)->
-		console.log('Created creep with name: ' + options.name)
-		new Creep(options)
+		if (options.type)
+			if (options.type == 'plane')
+				return new Plane(options)
+			if (options.type == 'tank')
+				return new Tank(options)
+			if (options.type == 'soldier')
+				return new Soldier(options)
+
+		# make soldier the default for now
+		new Soldier(options)
 
 class Game
+
 	constructor : (@elID) ->
 		this.fps = 60
+		@_spawntime = 500
 		this.renderables = {}
 
 	initialize : ->
@@ -181,10 +218,8 @@ class Game
 		@cf = new CreepFactory()
 
 		# Instantiate our special Creep Hank
-		hank = @cf.breed({name : 'Hank'})
-		hank.load(this, @map)	
-
-		console.log("Plays best at 200% zoom.")
+		hank = @cf.breed({name : 'Hank', type : 'soldier'})
+		hank.load(this, @map)
 
 	register : (id, renderable) ->
 		@renderables[id] = renderable
@@ -192,6 +227,7 @@ class Game
 	unregister : (id) ->
 		if (@renderables[id])
 			@renderables[id] = undefined
+			delete @renderables[id]
 
 	spawn : ->
 		c = @cf.breed({name : this.genID()})
@@ -221,12 +257,6 @@ class Game
 		if (@_intervalId)
 			return
 
-		self = this
-
-		spawn = ->
-			c = self.cf.breed({name : self.genID()})
-			c.load(self, self.map)
-
 		run = ((game) ->
 			loops = 0
 			skipTicks = (1000 / game.fps)
@@ -244,7 +274,38 @@ class Game
 
 		console.log("Starting game")
 		@_intervalId = setInterval(run, 0)
-		@_spawnId = setInterval(spawn, 500)
+		@doSpawn()		
+
+	doSpawn : =>
+		@stopSpawn()
+		@_spawnId = setInterval(@spawn, @_spawntime)
+
+	stopSpawn : =>
+		if (this._spawnId)
+			clearInterval(this._spawnId)
+			this._spawnId = null
+
+	more : =>
+		if (@_spawntime > 0)
+			@_spawntime -= 100
+		@doSpawn()
+		@_spawntime
+
+	less : =>
+		if (@_spawntime < 1200)
+			@_spawntime += 100
+		@doSpawn()
+		@_spawntime		
+
+	spawn : =>
+		name = @genID()
+		type = 'soldier'
+		if (name[0] > 'Z')
+			type = 'tank'
+		else if (name[1] > 'Z')
+			type = 'plane'
+		c = @cf.breed({name : name, type : type})
+		c.load(this, @map)
 
 	pause : ->
 
@@ -255,9 +316,7 @@ class Game
 			console.log("Stopping game")
 			clearInterval(this._intervalId)
 			this._intervalId = null
-		if (this._spawnId)
-			clearInterval(this._spawnId)
-			this._spawnId = null
+		@stopSpawn()
 
 $(document).ready(-> 
 	game = new Game('battlefield')
