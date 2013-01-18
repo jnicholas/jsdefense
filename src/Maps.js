@@ -19,7 +19,7 @@ MAPS = {
 			[water,grass,grass,grass,grass,grass,grass,grass,grass,grass,grass,grass,grass,grass,grass,grass,grass,grass,grass,rock],
 			[water,grass,grass,grass,grass,grass,grass,grass,grass,grass,grass,grass,grass,grass,grass,grass,grass,grass,grass,rock],
 			[water,grass,grass,grass,grass,grass,grass,grass,grass,grass,grass,grass,grass,grass,grass,grass,grass,grass,grass,rock],
-			[water,water,water,water,water,water,water,water,water,water,water,water,water,water,water,water,water,water,water,water]	
+			[water,water,water,water,water,water,water,water,water,water,water,water,water,water,water,water,water,water,water,water]
 		]
 	}
 }
