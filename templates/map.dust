@@ -11,3 +11,9 @@
 		<p>Unable to Generate Tiles</p>
 	{/tiles}
 </table>
+<div class="tower-menu">
+	<div class="tower" draggable="true" id="teleportTower"></div>
+	<div class="tower" draggable="true" id="rocketTower"></div>
+	<div class="tower" draggable="true" id="freezeTower"></div>
+	<div class="tower" draggable="true" id="gunTower"></div>
+</div>

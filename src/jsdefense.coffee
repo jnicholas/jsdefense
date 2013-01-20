@@ -26,8 +26,8 @@ class Renderable
 
 	update : false
 
-# Tile Class
 class Tile extends Renderable
+
 	constructor : ({@x, @y, @color, @entrance, @exit, @cls}) ->
 		@id = this.getId()
 
@@ -63,6 +63,7 @@ class Tile extends Renderable
 		@exit
 
 class Map extends Renderable
+
 	constructor : ->
 		this.tiles = new Array(0)
 
@@ -87,6 +88,7 @@ class Map extends Renderable
 
 				t.load(game)	
 				@tiles.push(t)
+
 		super game
 
 	render : (el) ->
@@ -95,6 +97,7 @@ class Map extends Renderable
 			for t in @tiles
 				t.loadEl(document.getElementById(t.getId()))			
 		dust.render("map", {tiles:@tiles}, fn)
+		@bindDragEvents(@game.elID)
 
 	getEntrance : ->
 		@entrance
@@ -102,14 +105,115 @@ class Map extends Renderable
 	getExit : ->
 		@exit
 
+	addTower : (options) ->
+		@game.tf.create(options);
+
+	bindDragEvents : (id) =>
+		# I have to define all of the drag callbacks here with fat arrows otherwise they 
+		# dont seem to have the correct scope. I think there's a better solution.
+		preventDefaults = (e) =>
+			e.stopPropagation()
+			e.preventDefault()
+
+		dragStartEvent = (e) =>
+			e.originalEvent.dataTransfer.setData('tower', e.target.id)
+
+		dragEnterOrLeaveEvent = (e) =>
+			# Only prevent defaults if the cell isn't an entrance or exit, this
+			# disables the from being able to place towers on them.
+			if(e.target.id != @getExit().id && e.target.id != @getEntrance().id)
+				preventDefaults e
+
+		dragOverEvent = (e) =>
+			# Only prevent defaults if the cell isn't an entrance or exit, this
+			# disables the from being able to place towers on them.
+			if(e.target.id != @getExit().id && e.target.id != @getEntrance().id)
+				preventDefaults e
+
+		dropEvent = (e) =>
+			preventDefaults e
+			towerType = e.originalEvent.dataTransfer.getData('tower')
+			targetTile = e.target.id
+			@addTower {type: towerType, target: targetTile}
+
+		mapEl = $('#' + id);
+		cells = mapEl.find('td .grass');
+		menuTowers = $('.tower-menu .tower')
+			
+		menuTowers.bind 'dragstart', dragStartEvent
+		cells.bind 'drop', dropEvent
+		cells.bind 'dragenter dragleave', dragEnterOrLeaveEvent
+		cells.bind 'dragover', dragOverEvent
+
+
 class BasicMap extends Map
+
 	getTileDefinitions : ->
 		MAPS.Basic.tiles
 
 	getId : ->
 		'map.basic'
 
+class Tower extends Renderable
+
+	constructor : (@tileX, @tileY) ->
+
+	render : ->
+		if(@getEl().length == 0)
+			afterRender = (err, out) =>
+				if(err)
+					@raise(err)
+				else
+					@el[0].innerHTML += out
+					@getEl().bind('click', ->
+						console.log 'tower clicked'
+					)
+
+			@id = @getId()
+
+			dust.render("tower", this, afterRender)
+
+	getEl : ->
+		$('#' + @getId())
+
+	getId : ->
+		'tower_' + @name
+
+	hasTarget : ->
+		return !(@target == null)
+
+	findTarget : ->
+		console.log 'Finding target to attack'
+
+	attackTarget : ->
+		if(@target)
+			console.log "attacking target " + @target
+		else
+			console.log "no target to attack :("
+
+class GunTower extends Tower
+
+class FreezeTower extends Tower
+
+class RocketTower extends Tower
+
+class TeleportTower extends Tower
+
+class TowerFactory
+
+	create : (options) ->
+		if(options.type)
+			if(options.type == 'gunTower')
+				return new GunTower(options)
+			if(options.type == 'freezeTower')
+				return new FreezeTower(options)
+			if(options.type == 'rocketTower')
+				return new RocketTower(options)
+			if(options.type == 'teleportTower')
+				return new TeleportTower(options)
+
 class Creep extends Renderable
+
 	constructor : ({@name, @velocity}) ->
 		if (!@velocity)
 			@velocity = 0.5
@@ -213,9 +317,10 @@ class Game
 		# Initialize a Map
 		@map = new BasicMap()
 		@map.load(this)
-		@map.render(document.getElementById(@elID))		
+		@map.render(document.getElementById(@elID))
 
 		@cf = new CreepFactory()
+		@tf = new TowerFactory()
 
 		# Instantiate our special Creep Hank
 		hank = @cf.breed({name : 'Hank', type : 'soldier'})
