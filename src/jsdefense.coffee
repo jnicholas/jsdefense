@@ -45,7 +45,7 @@ class Tile extends Renderable
 
 	loadEl : (el) ->
 		@el = el
-		this.onRender()
+		# this.onRender()
 
 	update : false
 
@@ -105,8 +105,10 @@ class Map extends Renderable
 	getExit : ->
 		@exit
 
-	addTower : (options) ->
-		@game.tf.create(options);
+	addTower : (options) ->		
+		tower = @game.tf.create(options);
+		tower.load(@game)
+		tower
 
 	bindDragEvents : (id) =>
 		# I have to define all of the drag callbacks here with fat arrows otherwise they 
@@ -134,7 +136,7 @@ class Map extends Renderable
 			preventDefaults e
 			towerType = e.originalEvent.dataTransfer.getData('tower')
 			targetTile = e.target.id
-			@addTower {type: towerType, target: targetTile}
+			@addTower {type: towerType, tile: targetTile}
 
 		mapEl = $('#' + id);
 		cells = mapEl.find('td .grass');
@@ -156,7 +158,8 @@ class BasicMap extends Map
 
 class Tower extends Renderable
 
-	constructor : (@tileX, @tileY) ->
+	constructor : ({@name, @tile}) ->
+		@cls = _arg.type
 
 	render : ->
 		if(@getEl().length == 0)
@@ -164,7 +167,7 @@ class Tower extends Renderable
 				if(err)
 					@raise(err)
 				else
-					@el[0].innerHTML += out
+					$('#' + @tile)[0].innerHTML += out
 					@getEl().bind('click', ->
 						console.log 'tower clicked'
 					)
@@ -177,7 +180,7 @@ class Tower extends Renderable
 		$('#' + @getId())
 
 	getId : ->
-		'tower_' + @name
+		'tower_' + @tile
 
 	hasTarget : ->
 		return !(@target == null)
@@ -190,6 +193,9 @@ class Tower extends Renderable
 			console.log "attacking target " + @target
 		else
 			console.log "no target to attack :("
+
+	draw : ->
+		@render()
 
 class GunTower extends Tower
 

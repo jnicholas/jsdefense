@@ -1,1 +1,20 @@
-body{margin:0;overflow:hidden;background-color:#191919}input[type="button"]:hover{cursor:pointer}div.buttonbar{margin-top:5px;clear:both;width:210px;margin:auto}#battlefield{margin-left:auto;margin-right:auto;width:480px;height:320px}.grid{color:#fff}.tile{height:24px;width:24px;font-size:.3em;text-align:center;vertical-align:middle}.tile.rock{background-color:#BEBEBE}.tile.water{background-color:#0077BE}.tile.grass{background-color:#54AB47}.creep{position:absolute;width:24px;height:24px;background-size:18px 18px;background-repeat:no-repeat}.creep.soldier{background-image:url('soldier.gif')}.creep.tank{background-image:url('tank.gif')}.creep.plane{width:46px;height:18px;background-image:url('airplane.gif')}.tower-menu{margin:5px 0 5px 0;clear:both}.tower-menu .tower{float:right;width:50px;height:50px;margin-left:5px}#gunTower{background-color:gold}#freezeTower{background-color:lightblue}#rocketTower{background-color:red}#teleportTower{background-color:purple}
+body{margin:0 0 0 0;overflow:hidden;background-color:#191919;}
+input[type="button"]:hover{cursor:pointer;}
+div.buttonbar{margin-top:5px;clear:both;width:210px;margin:auto;}
+#battlefield{margin-left:auto;margin-right:auto;width:480px;height:320px;}
+.grid{color:white;}
+.tile{height:24px;width:24px;font-size:0.3em;text-align:center;vertical-align:middle;}.tile.rock{background-color:#BEBEBE;}
+.tile.water{background-color:#0077BE;}
+.tile.grass{background-color:#54AB47;}
+.creep{position:absolute;width:24px;height:24px;background-size:18px 18px;background-repeat:no-repeat;}.creep.soldier{background-image:url('soldier.gif');}
+.creep.tank{background-image:url('tank.gif');}
+.creep.plane{width:46px;height:18px;background-image:url('airplane.gif');}
+.tower{width:24px;height:24px;}.tower.gunTower{background-color:gold;}
+.tower.freezeTower{background-color:lightblue;}
+.tower.rocketTower{background-color:red;}
+.tower.teleportTower{background-color:purple;}
+.tower-menu{margin:5px 0 5px 0;clear:both;}.tower-menu .tower{float:right;width:50px;height:50px;margin-left:5px;}
+#gunTower{background-color:gold;}
+#freezeTower{background-color:lightblue;}
+#rocketTower{background-color:red;}
+#teleportTower{background-color:purple;}
